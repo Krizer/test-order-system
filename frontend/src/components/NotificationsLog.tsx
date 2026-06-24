@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { notificationsApi } from '../api/client';
+import type { NotificationLogEntry } from '../types/order';
 
 /**
  * Этот компонент — наглядное доказательство того, что Observer-паттерн
@@ -7,9 +8,13 @@ import { notificationsApi } from '../api/client';
  * EventDispatcher дёргает Go-сервис по HTTP, а Go записывает это в свою
  * таблицу notification_logs. Здесь мы просто показываем эти записи.
  */
-export function NotificationsLog({ refreshKey }) {
-  const [logs, setLogs] = useState([]);
-  const [error, setError] = useState(null);
+interface NotificationsLogProps {
+  refreshKey: number;
+}
+
+export function NotificationsLog({ refreshKey }: NotificationsLogProps) {
+  const [logs, setLogs] = useState<NotificationLogEntry[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -19,8 +24,10 @@ export function NotificationsLog({ refreshKey }) {
       .then((data) => {
         if (!cancelled) setLogs(data ?? []);
       })
-      .catch((err) => {
-        if (!cancelled) setError(err.message);
+      .catch((err: unknown) => {
+        if (!cancelled) {
+          setError(err instanceof Error ? err.message : 'Не удалось загрузить журнал');
+        }
       });
 
     return () => {

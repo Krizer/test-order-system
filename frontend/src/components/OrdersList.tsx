@@ -1,19 +1,27 @@
 import { ordersApi } from '../api/client';
+import type { Order, OrderStatus } from '../types/order';
 
-const STATUS_LABELS = {
+const STATUS_LABELS: Record<OrderStatus, string> = {
   pending: 'Ожидает',
   confirmed: 'Подтверждён',
   shipped: 'Отправлен',
   cancelled: 'Отменён',
 };
 
-export function OrdersList({ orders, loading, error, onChanged }) {
-  async function handleConfirm(id) {
+interface OrdersListProps {
+  orders: Order[];
+  loading: boolean;
+  error: string | null;
+  onChanged: () => void;
+}
+
+export function OrdersList({ orders, loading, error, onChanged }: OrdersListProps) {
+  async function handleConfirm(id: number) {
     await ordersApi.confirm(id);
     onChanged();
   }
 
-  async function handleCancel(id) {
+  async function handleCancel(id: number) {
     await ordersApi.cancel(id);
     onChanged();
   }

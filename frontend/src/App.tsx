@@ -3,11 +3,12 @@ import { ordersApi } from './api/client';
 import { CreateOrderForm } from './components/CreateOrderForm';
 import { OrdersList } from './components/OrdersList';
 import { NotificationsLog } from './components/NotificationsLog';
+import type { Order } from './types/order';
 
 export default function App() {
-  const [orders, setOrders] = useState([]);
+  const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
 
   const loadOrders = useCallback(() => {
@@ -17,7 +18,7 @@ export default function App() {
     ordersApi
       .list()
       .then((data) => setOrders(data ?? []))
-      .catch((err) => setError(err.message))
+      .catch((err: unknown) => setError(err instanceof Error ? err.message : 'Не удалось загрузить заказы'))
       .finally(() => setLoading(false));
   }, []);
 
@@ -29,7 +30,7 @@ export default function App() {
     setRefreshKey((k) => k + 1);
   }
 
-  function handleCreated() {
+  function handleCreated(_order: Order) {
     handleChanged();
   }
 

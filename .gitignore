@@ -1,1 +1,23 @@
- .DS_Store
+# macOS
+.DS_Store
+
+# --- Frontend (Node / Vite / TypeScript) ---
+frontend/node_modules/
+frontend/dist/
+frontend/*.tsbuildinfo
+frontend/vite.config.js
+frontend/vite.config.d.ts
+
+# --- PHP Orders Service ---
+php-orders-service/vendor/
+
+# --- Go Notification Service ---
+# Скомпилированный бинарник, если собирать локально (go build),
+# а не только внутри Docker.
+go-notification-service/notification-service
+go-notification-service/server
+
+# --- Общее ---
+*.log
+.env
+.env.local

@@ -134,6 +134,29 @@ php tests/SmokeTest.php
 заказе бросает исключение, неизвестный `tier` в Factory бросает
 исключение).
 
+## Проверка типов и стиля фронтенда
+
+```bash
+cd frontend
+npm install
+npm run type-check   # только проверка типов (tsc --noEmit)
+npm run lint          # eslint . — стиль кода, правила React Hooks
+npm run build         # tsc -b && vite build — соберёт, если типы верны
+```
+
+Типы в `src/types/order.ts` — намеренно ручное зеркало JSON-ответов
+PHP и Go сервисов (а не сгенерированные автоматически), чтобы было
+видно весь контракт в одном файле.
+
+ESLint настроен через flat config (`eslint.config.js`, ESLint 9) с
+`typescript-eslint` (рекомендованный набор правил для `.ts`/`.tsx`),
+`eslint-plugin-react-hooks` (защита от нарушений правил хуков —
+условный/циклический вызов `useState`/`useEffect`) и
+`eslint-plugin-react-refresh` (совместимость с Vite Fast Refresh).
+`@typescript-eslint/no-explicit-any` включён как `error` — `any` в
+проекте не используется (см. `unknown` + сужение типа в `catch` в
+`api/client.ts` и компонентах).
+
 ## Структура проекта
 
 ```
@@ -159,11 +182,12 @@ go-notification-service/
 gateway/
   nginx.conf             — маршрутизация по префиксам пути
 
-frontend/
+frontend/                  — React + TypeScript (Vite)
   src/
-    api/client.js        — обёртка над fetch для Gateway
-    components/          — CreateOrderForm, OrdersList, NotificationsLog
-    App.jsx
+    api/client.ts         — типизированная обёртка над fetch для Gateway
+    components/           — CreateOrderForm, OrdersList, NotificationsLog (.tsx)
+    types/order.ts        — типы домена, зеркало JSON от PHP/Go сервисов
+    App.tsx
 
 postgres-init/           — SQL, выполняемый при первом старте Postgres
 docker-compose.yml
